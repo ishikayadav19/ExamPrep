@@ -1,8 +1,43 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import axios from 'axios';
 
 const AdminLogin = () => {
+    const [form,setform]=useState({
+        email: '',
+        password: '',
+    })
+    const handlechange = (e) => {
+        // console.log(e.target.value);
+
+        const {name, value}= e.target
+        setform((prev)=>({...prev,[name]: value})); //spread operator ka use hota hai data ko update krne ke liye
+            
+                //spread operator ka use hota hai data ko update krne ke liye
+        console.log(form);
+    };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        // console.log("Form Submitted",form)
+        const res = await axios.post('http://localhost:5000/api/admin/login',form)
+        console.log(res.data.message);
+        // console.log(res);
+
+        if (res.data.message=="Login Successfully"){
+          localStorage.setItem('role',res.data.admin.role);
+          localStorage.setItem('email',res.data.admin.email);
+          window.location.href='/admin'
+        }
+        else{
+          window.alert("Invalid credentials")
+          
+        }
+
+    }
+
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePassword = () => setShowPassword(!showPassword);
@@ -11,7 +46,10 @@ const AdminLogin = () => {
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center"
       style={{
-        background: 'linear-gradient(135deg, #1CB5E0, #000046)',
+        background: 'linear-gradient(135deg, #002028ff, #000000ff,   #002028ff)',
+
+       
+
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -43,7 +81,7 @@ const AdminLogin = () => {
               <i className="bi bi-shield-lock-fill me-2"></i>Admin Login
             </h2>
 
-            <form>
+            <form onSubmit={handleSubmit} className="row g-3">
               {/* Email */}
               <div className="mb-3 position-relative">
                 <label htmlFor="email" className="form-label text-white fw-semibold">
@@ -59,6 +97,8 @@ const AdminLogin = () => {
                     id="email"
                     placeholder="admin@example.com"
                     required
+                    name='email'
+                    onChange={handlechange}
                   />
                 </div>
               </div>
@@ -78,6 +118,8 @@ const AdminLogin = () => {
                     id="password"
                     placeholder="Enter password"
                     required
+                    name='password'
+                    onChange={handlechange}
                   />
                   <span
                     className="input-group-text bg-white border-0 cursor-pointer"
@@ -95,7 +137,7 @@ const AdminLogin = () => {
                   type="submit"
                   className="btn text-white fw-bold"
                   style={{
-                    background: 'linear-gradient(135deg, #1CB5E0, #000046)',
+                    background: 'linear-gradient(180deg, #011c23ff, #000000ff, #011c23ff)',
                     border: 'none',
                     borderRadius: '10px',
                     padding: '10px',
@@ -104,7 +146,7 @@ const AdminLogin = () => {
                   onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.02)')}
                   onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 >
-                  Sign In
+                  Submit
                 </button>
               </div>
 
@@ -119,3 +161,5 @@ const AdminLogin = () => {
 };
 
 export default AdminLogin;
+
+

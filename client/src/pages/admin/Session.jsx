@@ -1,161 +1,235 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrashAlt } from 'react-icons/fa';
-import 'animate.css';
+import axios from 'axios';
 
 const Session = () => {
-  const [sessionTitle, setSessionTitle] = useState('');
-  const [sessionDetails, setSessionDetails] = useState('');
-  const [sessions, setSessions] = useState([]);
-  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({ name: '', description: '' });
+  const [data, setData] = useState([]);
 
-  useEffect(() => {
-    document.title = 'Session Manager';
-  }, []);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const newSession = {
-      title: sessionTitle,
-      description: sessionDetails,
-    };
-
-    setSessions([...sessions, newSession]);
-    setSessionTitle('');
-    setSessionDetails('');
-    setSubmitted(true);
-
-    setTimeout(() => setSubmitted(false), 2000);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleDelete = (index) => {
-    const updatedSessions = sessions.filter((_, i) => i !== index);
-    setSessions(updatedSessions);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('http://localhost:5000/api/session', form);
+      if (res) alert('Session Added Successfully');
+    } catch (err) {
+      alert('Sorry, try again later');
+    }
+  };
+
+  const handlefetch = async () => {
+    const res = await axios.get('http://localhost:5000/api/session');
+    setData(res.data.data);
+  };
+
+  useEffect(() => {
+    handlefetch();
+  }, []);
+
+  const handleDelete =  (id) => {
+    console.log(id);
   };
 
   return (
-    <div
-      className="min-vh-100 d-flex justify-content-center align-items-start py-5"
-      style={{
-        background: 'linear-gradient(135deg, #1CB5E0, #000046)',
-       
-      }}
-    >
-      <div className="container">
-        {/* Form Card */}
-        <div
-          className="card shadow-lg border-0 animate__animated animate__fadeIn"
-          style={{ maxWidth: '700px', margin: '0 auto', borderRadius: '18px' }}
-        >
-          <div
-            className="card-header text-white text-center"
-            style={{
-              background: 'linear-gradient(135deg, #1CB5E0, #000046)',
-              borderTopLeftRadius: '18px',
-              borderTopRightRadius: '18px',
-            }}
-          >
-            <h4 className="mb-0 fw-bold">📝 Create New Session</h4>
+    <div style={styles.page}>
+      <h1 style={styles.heading}>
+        <i className="fa-solid fa-plus"></i> Add Session
+      </h1>
+
+      <div style={styles.card}>
+        <form onSubmit={handleSubmit}>
+          <label style={styles.label}>
+            <i className="fa-solid fa-heading me-2 text-white"></i> Session Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            placeholder="Enter session name"
+            onChange={handleChange}
+            style={styles.input}
+            className='form-control'
+          />
+
+          <label style={styles.label}>
+            <i className="fa-solid fa-align-left me-2 text-white"></i> Session Description
+          </label>
+          <textarea
+            name="description"
+            placeholder="Enter session description"
+            rows="4"
+            onChange={handleChange}
+            style={styles.textarea}
+            className='form-control'
+          ></textarea>
+
+          <div style={styles.row}>
+            <div style={styles.col}>
+              <label style={styles.label}>
+                <i className="fa-solid fa-play text-success me-2"></i> Start Date
+              </label>
+              <input type="date" className='form-control' style={styles.input} />
+            </div>
+            <div style={styles.col}>
+              <label style={styles.label}>
+                <i className="fa-solid fa-stop text-danger me-2"></i> End Date
+              </label>
+              <input type="date" className='form-control' style={styles.input} />
+            </div>
           </div>
-          <div className="card-body p-4 bg-light">
-            {submitted && (
-              <div className="alert alert-success text-center animate__animated animate__fadeInDown">
-                ✅ Session created successfully!
-              </div>
-            )}
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="sessionTitle" className="form-label">
-                  Session Title
-                </label>
-                <input
-                  type="text"
-                  id="sessionTitle"
-                  className="form-control"
-                  placeholder="Enter session title"
-                  value={sessionTitle}
-                  onChange={(e) => setSessionTitle(e.target.value)}
-                  required
-                />
-              </div>
+          <button type="submit" style={styles.button}>
+            <i className="fa-solid fa-plus me-1"></i> Add Session
+          </button>
+        </form>
+      </div>
 
-              <div className="mb-3">
-                <label htmlFor="sessionDetails" className="form-label">
-                  Session Details
-                </label>
-                <textarea
-                  id="sessionDetails"
-                  className="form-control"
-                  rows="4"
-                  placeholder="Enter session description"
-                  value={sessionDetails}
-                  onChange={(e) => setSessionDetails(e.target.value)}
-                  required
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="btn w-100 text-white"
-                style={{
-                  background: 'linear-gradient(135deg, #1CB5E0, #000046)',
-                  transition: '0.3s ease',
-                }}
-                onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.02)')}
-                onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-              >
-                ➕ Create Session
-              </button>
-            </form>
-          </div>
-        </div>
-
-        {/* Table Section */}
-        <div className="mt-5 bg-white rounded shadow p-4 animate__animated animate__fadeInUp">
-          <h5 className="mb-3 text-center text-dark fw-bold">📚 All Sessions</h5>
-          <div className="table-responsive">
-            <table className="table table-hover table-striped text-center align-middle">
-              <thead className="table-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Session Name</th>
-                  <th>Description</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sessions.length === 0 ? (
-                  <tr>
-                    <td colSpan="4" className="text-muted py-3">
-                      No sessions added yet.
-                    </td>
-                  </tr>
-                ) : (
-                  sessions.map((session, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{session.title}</td>
-                      <td>{session.description}</td>
-                      <td>
-                        <button
-                          className="btn btn-outline-danger btn-sm"
-                          onClick={() => handleDelete(index)}
-                          title="Delete"
-                        >
-                          <FaTrashAlt />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <h3 style={styles.listHeading}>
+        <i className="fa-solid fa-table-list me-2"></i> Session List
+      </h3>
+      <div style={styles.tableContainer}>
+        <table style={styles.table}>
+          <thead style={styles.thead}>
+            <tr>
+              <th>S.No.</th>
+              <th>Session Name</th>
+              <th>Description</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, i) => (
+              <tr key={item._id}>
+                <td>{i + 1}</td>
+                <td>{item.name}</td>
+                <td>{item.description}</td>
+                <td>{item.createdAt}</td>
+                <td>
+                  <button style={styles.deleteBtn} onClick={() => handleDelete(item._id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
+};
+
+const styles = {
+  page: {
+    background: 'linear-gradient(145deg, #0d1f25, #000000)',
+    minHeight: '100vh',
+    margin: 0,
+    
+    padding: '40px 20px',
+    color: 'white',
+    fontFamily: 'sans-serif',
+  },
+  heading: {
+    textAlign: 'center',
+    marginBottom: '30px',
+    fontSize: '2rem',
+    fontWeight: 'bold',
+  },
+  card: {
+    background: 'rgba(255, 255, 255, 0.19)',
+    borderRadius: '20px',
+    padding: '30px',
+    maxWidth: '700px',
+    margin: '0 auto 40px',
+    boxShadow: '0 4px 30px rgba(0,0,0,0.1)',
+    backdropFilter: 'blur(8px)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    transition: '0.3s ease-in-out',
+  },
+  label: {
+    display: 'block',
+    marginBottom: '6px',
+    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: '15px',
+  },
+  input: {
+    width: '100%',
+    padding: '10px 12px',
+    marginBottom: '20px',
+    borderRadius: '10px',
+    border: '1px solid #999',
+    background: '#111',
+    color: '#fff',
+    outline: 'none',
+    transition: '0.3s',
+  },
+  textarea: {
+    width: '100%',
+    padding: '10px 12px',
+    marginBottom: '20px',
+    borderRadius: '10px',
+    border: '1px solid #999',
+    background: '#111',
+    color: '#fff',
+    resize: 'vertical',
+    outline: 'none',
+  },
+  row: {
+    display: 'flex',
+    gap: '20px',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+  },
+  col: {
+    flex: '1',
+  },
+  button: {
+    width: '100%',
+    background: '#fff',
+    color: '#000',
+    padding: '10px',
+    border: 'none',
+    borderRadius: '10px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    transition: '0.3s',
+  },
+  listHeading: {
+    textAlign: 'center',
+    fontSize: '2.5rem',
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    color: '#fff',
+  },
+  tableContainer: {
+    overflowX: 'auto',
+    padding: '0 10px',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    background: 'rgba(255, 255, 255, 1)',
+    color: '#000',
+    borderRadius: '10px',
+    boxShadow: '0 4px 30px rgba(0,0,0,0.1)',
+    
+  },
+  thead: {
+    background: '#eeeeeee8',
+    borderBottom: '2px solid #ddd',
+  },
+  deleteBtn: {
+    margin: '5px 0',
+    background: 'transparent',
+    fontWeight: 'bold',
+    color: '#ff4d4d',
+    border: '1px solid #ff4d4d',
+    padding: '3px 10px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: '0.2s',
+  },
 };
 
 export default Session;

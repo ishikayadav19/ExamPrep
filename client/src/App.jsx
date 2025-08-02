@@ -11,6 +11,7 @@ import Examinee from './pages/admin/Examinee'
 import Session from './pages/admin/Session'
 import 'animate.css';
 import AdminLogin from './pages/admin/AdminLogin'
+import ViewSession from './pages/admin/ViewSession'
 
 
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/admin/" element={<Dashboard/>}>{/*  component Route kr rhe yha  */}
         <Route path="subject" element={<Subject/>}></Route> {/* Subject component Route kr rhe yha  */}
         <Route path="examinee" element={<Examinee/>}></Route> {/* Examinee component Route kr rhe yha  */}
+       
         <Route path="session" element={<Session/>}></Route>
         </Route> {/* Session component Route kr rhe yha  */}
       </Routes>

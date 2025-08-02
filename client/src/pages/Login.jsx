@@ -10,7 +10,7 @@ const Login = () => {
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center"
       style={{
-        background: 'linear-gradient(135deg, #1CB5E0, #000046)',
+        background: 'linear-gradient(135deg, #002028ff, #000000ff,   #002028ff)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -91,7 +91,7 @@ const Login = () => {
                   type="submit"
                   className="btn text-white w-100 fw-bold"
                   style={{
-                    background: 'linear-gradient(135deg, #1CB5E0, #000046)',
+                    background: 'linear-gradient(180deg, #011c23ff, #000000ff, #011c23ff)',
                     border: 'none',
                     borderRadius: '10px',
                     padding: '10px',

@@ -17,7 +17,10 @@ mongoose.connect(URL)
     });
 //apis started
 app.use('/api/examinee',require('./routes/examineeRoutes')); //examinee routes ko use kr liya
-
+//admin api
+app.use('/api/admin',require('./routes/adminRoutes')); //admin routes ko use kr liya
+//session api
+app.use('/api/session/',require('./routes/sessionRoutes')); //session routes ko use kr liya
 //api ended
 
 app.listen(5000,()=>{
