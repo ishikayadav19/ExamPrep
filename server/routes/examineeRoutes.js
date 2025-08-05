@@ -1,15 +1,27 @@
-const user = require('../models/Examinee'); // Examinee model ko import kr liya
-const express = require('express'); // express ko import kr liya
-const router = express.Router(); // express ka router bana liya kyuki routes define krne hain
+const Examinee=require('../models/Examinee');
+const express=require('express');
+const router=express.Router();
 
-router.get('/',async(req,res)=>{
-    return res.json("Api call successful"); // GET request par response de diya, jaise hi koi GET request karega, yeh response milega
-});
+router.get('/',async(req,res)=>{   //it will  be used when we get the "get" request
+     const examinee= await Examinee.find();
+     return res.json({data: examinee});
+})
+
 
 router.post('/', async (req,res)=>{
    const examinee=await new Examinee(req.body);
     examinee.save();
-    return res.status(200).json({message: 'Examinee route is working'});
+    return res.json({message: 'Examinee route is working'});
 })
-module.exports = router; // router ko export kr diya taaki isse use kiya ja sake kisi aur file mein
+router.delete('/:id',async(req,res)=>{
+    const {id}=req.params
+    const examinee=await Examinee.findByIdAndDelete(id);
 
+    return res.json({message:"deleted successfully"});
+})
+router.put('/:id',async(req,res)=>{
+    const {id}=req.params;
+    const examinee=await Examinee.findByIdAndUpdate(id,req.body)
+    return res.json({message:"examinee updated successfully"});
+})
+module.exports=router;     //because we want to use this router in other files that's why we use exports

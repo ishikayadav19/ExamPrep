@@ -1,86 +1,103 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function Examinee() {
+const QuestionBank = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    college: '',
-    qualification: '',
-    address: '',
-    number: '',
-    password: ''
+    questionText: '',
+    optionA: '',
+    optionB: '',
+    optionC: '',
+    optionD: '',
+    correctAnswer: '',
+    subject: '',
   });
-  const [editMode, setEditMode] = useState(false);
-  const [editId, setEditId] = useState(null);
-  const [data, setData] = useState([]);
 
-  const handleFetch = async () => {
+  const [questions, setQuestions] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [editForm, setEditForm] = useState(false);
+  const [id, setId] = useState('');
+
+  useEffect(() => {
+    fetchQuestions();
+    fetchSubjects();
+  }, []);
+
+  const fetchQuestions = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/examinee`);
-      setData(res.data.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+      const res = await axios.get(`http://localhost:5000/api/question`);
+      setQuestions(res.data.data || []);
+    } catch (err) {
+      console.error('Error fetching questions:', err);
     }
   };
 
-  useEffect(() => {
-    handleFetch();
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const fetchSubjects = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/subject`);
+      setSubjects(res.data.data || []);
+    } catch (err) {
+      console.error('Error fetching subjects', err);
+      setSubjects([]);
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     try {
-      if (editMode) {
-        await axios.put(`http://localhost:5000/api/examinee/${editId}`, formData);
-        setEditMode(false);
-        setEditId(null);
-        handleFetch();
+      if (editForm) {
+        await axios.put(`http://localhost:5000/api/question/${id}`, formData);
+        setEditForm(false);
+        setId('');
+        fetchQuestions();
       } else {
-        await axios.post(`http://localhost:5000/api/examinee`, formData);
-        handleFetch();
+        await axios.post(`http://localhost:5000/api/question`, formData);
+        fetchQuestions();
       }
       setFormData({
-        name: '',
-        email: '',
-        number: '',
-        college: '',
-        qualification: '',
-        address: '',
-        password: ''
+        questionText: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        correctAnswer: '',
+        subject: '',
       });
-      handleFetch();
-    } catch (error) {
-      console.error('Error submitting form:', error);
+    } catch (err) {
+      console.error(err);
+      alert('Sorry, try again.');
     }
   };
 
   const handleDelete = async (id) => {
-    const res = await axios.delete(`http://localhost:5000/api/examinee/${id}`);
-    if (res) {
-      alert("Deleted successfully");
-      handleFetch();
-    } else {
-      alert("try again later");
+    try {
+      await axios.delete(`http://localhost:5000/api/question/${id}`);
+      alert('Deleted successfully');
+      fetchQuestions();
+    } catch (err) {
+      alert('Try again later.');
     }
   };
 
-  const handleEdit = async (item) => {
+  const handleEdit = (item) => {
     setFormData({
-      name: item.name,
-      email: item.email,
-      number: item.number,
-      college: item.college,
-      qualification: item.qualification,
-      address: item.address,
-      password: item.password || ''
+      questionText: item.questionText,
+      optionA: item.optionA,
+      optionB: item.optionB,
+      optionC: item.optionC,
+      optionD: item.optionD,
+      correctAnswer: item.correctAnswer,
+      subject: item.subject,
     });
-    setEditMode(true);
-    setEditId(item._id);
+    setEditForm(true);
+    setId(item._id);
   };
 
   return (
@@ -88,127 +105,130 @@ function Examinee() {
       {/* Gradient Heading Bar */}
       <div style={styles.headingBar}>
         <h1 style={styles.heading}>
-          <i className="fa-solid fa-user-plus" style={{ marginRight: 10 }}></i>
-          {editMode ? "Edit Examinee" : "Register Examinee"}
+          <i className="fa-solid fa-question-circle" style={{ marginRight: 10 }} />
+          {editForm ? "Edit Question" : "Question Bank"}
         </h1>
       </div>
 
-      {/* Glassy Form Card, wider */}
+      {/* Form Card */}
       <div style={styles.card}>
         <form onSubmit={handleSubmit}>
           <div style={styles.formGrid}>
-            {/* First Row */}
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                <i className="fa-solid fa-user me-2"></i> Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                placeholder="Enter Name"
-                onChange={handleChange}
-                style={styles.input}
-                className="form-control"
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                <i className="fa-solid fa-envelope me-2"></i> Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                placeholder="Enter Email"
-                onChange={handleChange}
-                style={styles.input}
-                className="form-control"
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                <i className="fa-solid fa-phone me-2"></i> Phone Number
-              </label>
-              <input
-                type="text"
-                name="number"
-                value={formData.number}
-                placeholder="Enter Phone Number"
-                onChange={handleChange}
-                style={styles.input}
-                className="form-control"
-                required
-              />
-            </div>
-            {/* Second Row */}
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                <i className="fa-solid fa-building-columns me-2"></i> College
-              </label>
-              <input
-                type="text"
-                name="college"
-                value={formData.college}
-                placeholder="Enter College"
-                onChange={handleChange}
-                style={styles.input}
-                className="form-control"
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                <i className="fa-solid fa-graduation-cap me-2"></i> Qualification
-              </label>
-              <input
-                type="text"
-                name="qualification"
-                value={formData.qualification}
-                placeholder="Enter Qualification"
-                onChange={handleChange}
-                style={styles.input}
-                className="form-control"
-                required
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                <i className="fa-solid fa-lock me-2"></i>Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                placeholder="Enter Password"
-                onChange={handleChange}
-                style={styles.input}
-                className="form-control"
-                required
-              />
-            </div>
-            {/* Third Row */}
             <div style={styles.formGroupWide}>
               <label style={styles.label}>
-                <i className="fa-solid  fa-location-dot  me-2"></i> Address
+                <i className="fa-solid fa-question me-2"></i> Question
               </label>
-              <textarea
+              <input
                 type="text"
-                name="address"
-                value={formData.address}
-                placeholder="Enter your address"
+                name="questionText"
+                value={formData.questionText}
                 onChange={handleChange}
                 style={styles.input}
-                className="form-control"
                 required
+                placeholder="Enter question here"
               />
             </div>
+
+            {/* Options A & B */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                <i className="fa-regular fa-square me-2"></i> Option A
+              </label>
+              <input
+                type="text"
+                name="optionA"
+                value={formData.optionA}
+                onChange={handleChange}
+                style={styles.input}
+                required
+                placeholder="Option A"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                <i className="fa-regular fa-square me-2"></i> Option B
+              </label>
+              <input
+                type="text"
+                name="optionB"
+                value={formData.optionB}
+                onChange={handleChange}
+                style={styles.input}
+                required
+                placeholder="Option B"
+              />
+            </div>
+
+            {/* Options C & D */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                <i className="fa-regular fa-square me-2"></i> Option C
+              </label>
+              <input
+                type="text"
+                name="optionC"
+                value={formData.optionC}
+                onChange={handleChange}
+                style={styles.input}
+                required
+                placeholder="Option C"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                <i className="fa-regular fa-square me-2"></i> Option D
+              </label>
+              <input
+                type="text"
+                name="optionD"
+                value={formData.optionD}
+                onChange={handleChange}
+                style={styles.input}
+                required
+                placeholder="Option D"
+              />
+            </div>
+
+            {/* Correct Answer */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                <i className="fa-solid fa-check-double me-2"></i> Correct Answer
+              </label>
+              <input
+                type="text"
+                name="correctAnswer"
+                value={formData.correctAnswer}
+                onChange={handleChange}
+                style={styles.input}
+                required
+                placeholder="Type the FULL correct option text"
+              />
+              <span style={styles.helperText}>Type the full text of the correct option.</span>
+            </div>
+
+            {/* Subject */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                <i className="fa-solid fa-book me-2"></i> Subject
+              </label>
+              <select
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              >
+                <option value="">Select subject</option>
+                {subjects.map((sub) => (
+                  <option key={sub._id} value={sub._id}>{sub.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
+
           <button type="submit" style={styles.button}>
-            <i className={`fa-solid ${editMode ? 'fa-check' : 'fa-plus'} me-1`}></i>
-            {editMode ? "Update Examinee" : "Register Examinee"}
+            <i className={`fa-solid ${editForm ? 'fa-check' : 'fa-plus'} me-1`} />
+            {editForm ? 'Update Question' : 'Add Question'}
           </button>
         </form>
       </div>
@@ -217,7 +237,7 @@ function Examinee() {
       <div style={styles.listHeadingBar}>
         <h3 style={styles.listHeading}>
           <i className="fa-solid fa-table-list me-2"></i>
-          Examinee List
+          Question List
         </h3>
       </div>
 
@@ -226,46 +246,52 @@ function Examinee() {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>S.No.</th>
-              <th style={styles.th}>Name</th>
-              <th style={styles.th}>Email</th>
-              <th style={styles.th}>College</th>
-              <th style={styles.th}>Qualification</th>
-              <th style={styles.th}>Address</th>
-              <th style={styles.th}>Password</th>
-              <th style={styles.th}>Number</th>
+              <th style={styles.th}>#</th>
+              <th style={styles.th}>Question</th>
+              <th style={styles.th}>Option A</th>
+              <th style={styles.th}>Option B</th>
+              <th style={styles.th}>Option C</th>
+              <th style={styles.th}>Option D</th>
+              <th style={styles.th}>Correct Answer</th>
               <th style={styles.th}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {data.map((item, i) => (
-              <tr key={item._id}>
-                <td style={styles.td}>{i + 1}</td>
-                <td style={styles.td}>{item.name}</td>
-                <td style={styles.td}>{item.email}</td>
-                <td style={styles.td}>{item.college}</td>
-                <td style={styles.td}>{item.qualification}</td>
-                <td style={styles.td}>{item.address}</td>
-                <td style={styles.td}>{item.password}</td>
-                <td style={styles.td}>{item.number}</td>
-                <td style={styles.td}>
-                  <button style={styles.deleteBtn} onClick={() => handleDelete(item._id)}>
-                    Delete
-                  </button>
-                  <button style={styles.editBtn} onClick={() => handleEdit(item)}>
-                    Edit
-                  </button>
+            {questions.length > 0 ? (
+              questions.map((q, index) => (
+                <tr key={q._id}>
+                  <td style={styles.td}>{index + 1}</td>
+                  <td style={styles.td}>{q.questionText}</td>
+                  <td style={styles.td}>{q.optionA}</td>
+                  <td style={styles.td}>{q.optionB}</td>
+                  <td style={styles.td}>{q.optionC}</td>
+                  <td style={styles.td}>{q.optionD}</td>
+                  <td style={styles.td}>{q.correctAnswer}</td>
+                  <td style={styles.td}>
+                    <button style={styles.deleteBtn} onClick={() => handleDelete(q._id)}>
+                      Delete
+                    </button>
+                    <button style={styles.editBtn} onClick={() => handleEdit(q)}>
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td style={styles.td} colSpan="8" className="text-center text-muted">
+                  No questions added yet.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
     </div>
   );
-}
+};
 
-// Styles based on Subject.js, with wider form and grid layout
+// Styles: glass, gradients, grid-form, wide card/table
 const styles = {
   page: {
     minHeight: "100vh",
@@ -295,7 +321,7 @@ const styles = {
   card: {
     background: "linear-gradient(145deg, #0e556a62, #00000068)",
     borderRadius: '18px',
-    padding: '38px 38px 28px 38px',
+    padding: '36px 38px 28px 38px',
     maxWidth: '1150px',
     margin: '0 auto 30px auto',
     border: "1.5px solid #1398be30",
@@ -311,13 +337,13 @@ const styles = {
   formGroup: {
     display: 'flex',
     flexDirection: 'column',
-    marginBottom: '24px',
+    marginBottom: '19px',
   },
   formGroupWide: {
     gridColumn: '1 / span 3',
     display: 'flex',
     flexDirection: 'column',
-    marginBottom: '21px',
+    marginBottom: '25px',
   },
   label: {
     display: 'block',
@@ -326,6 +352,11 @@ const styles = {
     color: '#000000ff',
     fontSize: '18px',
     letterSpacing: ".6px"
+  },
+  helperText: {
+    fontSize: "0.97rem",
+    color: "#01859c",
+    marginTop: "2px"
   },
   input: {
     width: '100%',
@@ -384,7 +415,7 @@ const styles = {
     borderCollapse: "collapse",
     fontSize: "1.05rem",
     background: "none",
-    minWidth: "800px",
+    minWidth: "900px",
     borderRadius: "8px 8px 0 0"
   },
   th: {
@@ -430,4 +461,4 @@ const styles = {
   }
 };
 
-export default Examinee;
+export default QuestionBank;

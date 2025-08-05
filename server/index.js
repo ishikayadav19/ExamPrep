@@ -21,6 +21,12 @@ app.use('/api/examinee',require('./routes/examineeRoutes')); //examinee routes k
 app.use('/api/admin',require('./routes/adminRoutes')); //admin routes ko use kr liya
 //session api
 app.use('/api/session/',require('./routes/sessionRoutes')); //session routes ko use kr liya
+//subject api
+app.use('/api/subject',require('./routes/subjectRoutes')); //subject routes ko use kr liya
+//question api
+app.use('/api/question',require('./routes/questionRoutes')); //question routes ko use kr liya
+//examination api
+app.use('/api/exams/',require('./routes/examinationRoutes')); //examination routes ko use kr liya
 //api ended
 
 app.listen(5000,()=>{

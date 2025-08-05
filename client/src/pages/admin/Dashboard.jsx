@@ -17,12 +17,13 @@ const Dashboard = () => {
   }
 
   const navItems = [
-    { to: '/admin/session', label: 'Add Session', icon: <FaChalkboardTeacher /> },
+    { to: '/admin/session', label: 'Session', icon: <FaChalkboardTeacher /> },
     { to: '/admin/subject', label: 'Subject', icon: <FaBook /> },
     { to: '/admin/examinee', label: 'Examinee', icon: <FaUserGraduate /> },
-    { to: '/admin/question-bank', label: 'Question Bank', icon: <FaQuestionCircle /> },
+    { to: '/admin/questionBank', label: 'Question Bank', icon: <FaQuestionCircle /> },
     { to: '/admin/examination', label: 'Examination', icon: <FaClipboardList /> },
-    { to: '/admin/result', label: 'Result', icon: <FaChartBar /> },
+    { to: '/admin/resultReport', label: 'Result Report', icon: <FaChartBar /> },
+    { to: '/admin/resultDeclaration', label: 'Result Declaration', icon: <FaQuestionCircle /> },
   ];
 
   return (
@@ -32,7 +33,8 @@ const Dashboard = () => {
           margin: 0;
           padding: 0;
           font-family: 'Segoe UI', sans-serif;
-          background-color: #ffffffff;
+          background:linear-gradient(135deg, #a3f2f8c4, #ffffffff, #a3f2f8c4);
+
         }
 
         .dashboard-container {
@@ -136,7 +138,8 @@ const Dashboard = () => {
 
         .content {
           padding: 0px;
-          background: #f9f9f9;
+          background:linear-gradient(135deg, #a3f2f8c4, #ffffffff, #a3f2f8c4);
+
         }
 
         @media (max-width: 768px) {
