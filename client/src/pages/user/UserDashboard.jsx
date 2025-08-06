@@ -16,27 +16,35 @@ const sidebarGradient = "linear-gradient(145deg, #0d1f25, #000000)";
 const inactiveLinkBg = "none";
 const activeLinkBg = " #f9fafa22";
 const activeLinkShadow = "inset 2px 2px 5px #00f0ff33";
+const role = localStorage.getItem('userRole');
+
+  if (role === 'user') {
+    var Email = localStorage.getItem('userEmail');
+  }
+  else{
+    window.location.href = '/';
+  }
 
 // Navigation items array
 const navItems = [
-  { to: "/examinee", label: "Profile", icon: <FaUserCircle /> },
-  { to: "/examinee/scheduled", label: "Scheduled Exams", icon: <FaCalendarAlt /> },
-  { to: "/examinee/myexams", label: "My Exams", icon: <FaClipboardCheck /> },
-  { to: "/examinee/result", label: "Result", icon: <FaChartLine /> },
-  { to: "/examinee/change-password", label: "Change Password", icon: <FaKey /> },
+  { to: "/user", label: "Profile", icon: <FaUserCircle /> },
+  { to: "/user/scheduled", label: "Scheduled Exams", icon: <FaCalendarAlt /> },
+  { to: "/user/myexams", label: "My Exams", icon: <FaClipboardCheck /> },
+  { to: "/user/result", label: "Result", icon: <FaChartLine /> },
+  { to: "/user/changePassword", label: "Change Password", icon: <FaKey /> },
 ];
 
 // Helper function to fix active link issue
 function isLinkActive(itemPath, currentPath) {
-  if (itemPath === "/examinee") {
-    // Profile active only on exact '/examinee' route, not subpaths
-    return currentPath === "/examinee";
+  if (itemPath === "/user") {
+    // Profile active only on exact '/user' route, not subpaths
+    return currentPath === "/user";
   }
   // For other routes, active if current path starts with the nav path
   return currentPath.startsWith(itemPath);
 }
 
-export default function ExamineeDashboard() {
+export default function UserDashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
@@ -163,9 +171,9 @@ export default function ExamineeDashboard() {
   `;
 
   function handleLogout() {
-    localStorage.removeItem("role");
-    localStorage.removeItem("email");
-    window.location.href = "/examinee-login";
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail");
+    window.location.href = "/";
   }
 
   // You might want to fetch user info for greeting/profile!

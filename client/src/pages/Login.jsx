@@ -2,9 +2,31 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'animate.css';
-
+import axios from 'axios';
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [data, formData] = useState({
+    email:'',
+    password:''
+  });
+   const handleChange = (e) => {
+    // console.log(e.target.value)
+    formData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    console.log(data);
+   }
+  
+   const handleSubmit = async (e) => {
+    e.preventDefault(); 
+    // console.log("Form Submitted", data);
+    const res = await axios.post('http://localhost:5000/api/examinee/login',data);
+    console.log(res.data.message);
+    if(res.data.message === 'Login successfully') {
+    
+      localStorage.setItem('userRole', res.data.user.role);
+      localStorage.setItem('userEmail', res.data.user.email);
+      window.location.href = '/user/';
+    }
+   }
 
   return (
     <div
@@ -39,7 +61,7 @@ const Login = () => {
               <i className="bi bi-box-arrow-in-right me-2"></i>Login
             </h2>
 
-            <form className="row g-3">
+            <form className="row g-3" onSubmit={handleSubmit}>
               {/* Email */}
               <div className="col-12">
                 <label htmlFor="inputEmail4" className="form-label text-white fw-semibold">
@@ -55,6 +77,9 @@ const Login = () => {
                     id="inputEmail4"
                     placeholder="you@example.com"
                     required
+                    onChange={handleChange}
+                    name="email"
+
                   />
                 </div>
               </div>
@@ -74,6 +99,8 @@ const Login = () => {
                     id="inputPassword4"
                     placeholder="Enter password"
                     required
+                    name="password"
+                    onChange={handleChange}
                   />
                   <span
                     className="input-group-text bg-white border-0"

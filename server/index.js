@@ -26,7 +26,8 @@ app.use('/api/subject',require('./routes/subjectRoutes')); //subject routes ko u
 //question api
 app.use('/api/question',require('./routes/questionRoutes')); //question routes ko use kr liya
 //examination api
-app.use('/api/exams/',require('./routes/examinationRoutes')); //examination routes ko use kr liya
+// app.use('/api/abc/',require('./routes/questionRoutes')); //examination routes ko use kr liya
+app.use('/api/exams',require('./routes/examinationRoutes')); //examination routes ko use kr liya    
 //api ended
 
 app.listen(5000,()=>{

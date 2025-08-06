@@ -1,33 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router';
+import axios from 'axios';
 // import { styles } from './styles'; // If you put your styles in a separate file, you can import here
 
 // Demo data for "My exams"
-const demoData = [
-  {
-    _id: '1',
-    examName: 'Mathematics',
-    dateOfExam: '2024-07-01',
-    totalMarks: 100,
-    obtainMarks: 89,
-    status: 'Passed'
-  },
-  {
-    _id: '2',
-    examName: 'Physics',
-    dateOfExam: '2024-07-10',
-    totalMarks: 100,
-    obtainMarks: 53,
-    status: 'Passed'
-  },
-  {
-    _id: '3',
-    examName: 'History',
-    dateOfExam: '2024-07-15',
-    totalMarks: 100,
-    obtainMarks: 32,
-    status: 'Failed'
-  }
-];
 
 const styles = {
   page: {
@@ -98,11 +74,16 @@ const styles = {
 };
 
 const MyExam = () => {
-  const [data, setData] = useState([]);
+  const [exam, setExam] = useState([]);
+  const fetchExams = async () => {
+    const res = await axios.get('http://localhost:5000/api/exams/exams');
+    console.log(res.data);
+    setExam(res.data);
+
+  };
 
   useEffect(() => {
-    // Replace this with API as needed
-    setData(demoData);
+    fetchExams();
   }, []);
 
   return (
@@ -119,25 +100,18 @@ const MyExam = () => {
               <th style={styles.th}>S.No.</th>
               <th style={styles.th}>Exam Name</th>
               <th style={styles.th}>Date of Exam</th>
-              <th style={styles.th}>Total Marks</th>
-              <th style={styles.th}>Obtain Marks</th>
-              <th style={styles.th}>Status</th>
+              <th style={styles.th}>Time</th>
+              <th style={styles.th}>Action</th>
             </tr>
           </thead>
           <tbody>
-            {data.map((item, idx) => (
+            {exam.map((item, idx) => (
               <tr key={item._id}>
                 <td style={styles.td}>{idx + 1}</td>
-                <td style={styles.td}>{item.examName}</td>
-                <td style={styles.td}>{item.dateOfExam}</td>
-                <td style={styles.td}>{item.totalMarks}</td>
-                <td style={styles.td}>{item.obtainMarks}</td>
-                <td style={{
-                    ...styles.td,
-                    ...(item.status === "Passed" ? styles.statusPass : styles.statusFail)
-                  }}>
-                    {item.status}
-                </td>
+                <td style={styles.td}>{item.title}</td>
+                <td style={styles.td}>{new Date(item.dateOfExam).toLocaleDateString()}</td>
+                <td style={styles.td}>{item.time}</td>
+                <td style={styles.td}><Link to={`/user/getexam/${item._id}`} className='btn btn-primary'>Start Exam</Link></td>
               </tr>
             ))}
           </tbody>

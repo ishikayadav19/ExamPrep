@@ -83,7 +83,7 @@ router.post('/', async (req, res) => {
 });
 
 // GET: Fetch all exams
-router.get('/', async (req, res) => {
+router.get('/exams', async (req, res) => {
   try {
     const exams = await Examination.find({}, 'title date time status')
       .populate('sessionId', 'name')
@@ -190,5 +190,51 @@ router.get('/exam/:examId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+router.post('/submit-exam', async (req, res) => {
+  try {
+    const { examId, answers } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(examId)) {
+      return res.status(400).json({ error: `Invalid exam ID: ${examId}` });
+    }
+
+    const exam = await Examination.findById(examId).populate('questions');
+    if (!exam) {
+      return res.status(404).json({ error: 'Exam not found' });
+    }
+    // here is
+    let score = 0;
+    const totalMarks = parseInt(exam.totalMarks);
+    const marksPerQuestion = totalMarks / exam.questions.length;
+
+    const results = exam.questions.map((question) => {
+      const submittedAnswer = answers[question._id];
+      const isCorrect = submittedAnswer === question.correctAnswer;
+      if (isCorrect) {
+        score += marksPerQuestion;
+      }
+      return {
+        questionId: question._id,
+        question: question.question,
+        selectedAnswer: submittedAnswer,
+        correctAnswer: question.correctAnswer,
+        isCorrect,
+      };
+    });
+
+    const passed = score >= parseInt(exam.passingMarks);
+    res.json({
+      score,
+      totalMarks,
+      passed,
+      results,
+    });
+  } catch (err) {
+    console.error('Error submitting exam:', err);
+    res.status(500).json({ error: 'Failed to submit exam' });
+  }
+});
+
 
 module.exports = router;
